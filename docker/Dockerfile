@@ -1,7 +1,14 @@
-FROM nginx:alpine
+FROM node:20-alpine
 
-COPY app/index.html /usr/share/nginx/html/index.html
+WORKDIR /app
 
-EXPOSE 80
+COPY app/package*.json ./
+RUN npm install --omit=dev
 
-CMD sed -i "s/CONTAINER_HOSTNAME/$(hostname)/" /usr/share/nginx/html/index.html && exec nginx -g 'daemon off;'
+COPY app/server.js ./
+COPY app/views ./views
+COPY app/public ./public
+
+EXPOSE 3000
+
+CMD ["node", "server.js"]

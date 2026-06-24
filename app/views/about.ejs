@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <script>
+    (function () {
+      document.documentElement.dataset.theme = localStorage.getItem('devops-theme') || 'light';
+      document.documentElement.lang = (localStorage.getItem('devops-lang') || 'ru') === 'kk' ? 'kk' : 'ru';
+    })();
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/site-theme.css">
+  <style>
+    body { font-family: Inter, system-ui, -apple-system, sans-serif; }
+    .logo-font { font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; letter-spacing: -0.02em; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <header class="bg-white border-b border-slate-200">
+    <div class="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
+      <a href="/" class="flex items-center gap-x-3">
+        <div class="w-8 h-8 bg-indigo-600 rounded-xl flex items-center justify-center">
+          <i class="fa-solid fa-infinity text-white text-xl"></i>
+        </div>
+        <span class="logo-font text-2xl font-semibold tracking-tight">DevOps News</span>
+      </a>
+      <nav class="flex items-center gap-2 text-sm">
+        <a href="/" class="px-3 py-2 text-slate-600 hover:text-indigo-600">Новости</a>
+        <a href="/learning" class="px-3 py-2 text-slate-600 hover:text-indigo-600">Обучение</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-6 py-12">
+    <section class="mb-10">
+      <h1 class="text-4xl md:text-5xl font-semibold tracking-tight mb-3">О проекте</h1>
+      <p class="text-xl text-slate-600">Простые и понятные материалы про DevOps.</p>
+    </section>
+
+    <section class="bg-white border border-slate-200 rounded-2xl p-7 mb-8">
+      <h2 class="text-2xl font-semibold tracking-tight mb-4">Зачем мы это делаем</h2>
+      <div class="space-y-4 text-slate-700 leading-7">
+        <p>DevOps — мощная штука. Но большинство материалов либо слишком академичные, либо просто «установи вот это и скопируй команды».</p>
+        <p>Мы хотим, чтобы любой разработчик, сисадмин или студент мог зайти и за 7 минут понять, зачем нужен Kubernetes или как работает GitOps на практике.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="text-2xl font-semibold tracking-tight mb-4">Принципы сайта</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-white border border-slate-200 rounded-2xl p-5">
+          <h3 class="font-semibold mb-2">Простота языка.</h3>
+          <p class="text-sm text-slate-600 leading-6">Никаких «оркестрация отказоустойчивых микросервисов». Пишем как объясняем коллегам.</p>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-2xl p-5">
+          <h3 class="font-semibold mb-2">Практика в приоритете.</h3>
+          <p class="text-sm text-slate-600 leading-6">Минимум теории, максимум рабочих примеров и команд.</p>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-2xl p-5">
+          <h3 class="font-semibold mb-2">Закрытая редакция.</h3>
+          <p class="text-sm text-slate-600 leading-6">Публикация и правки доступны только через приватный вход для администраторов.</p>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-2xl p-5">
+          <h3 class="font-semibold mb-2">Актуальность.</h3>
+          <p class="text-sm text-slate-600 leading-6">Мы обновляем материалы под современные инструменты 2025–2026 годов.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="border-t bg-white py-6">
+    <div class="max-w-4xl mx-auto px-6 text-xs text-slate-400">DevOps News · 2026</div>
+  </footer>
+  <script src="/site-prefs.js"></script>
+</body>
+</html>

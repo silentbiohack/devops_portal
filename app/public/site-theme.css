@@ -1,0 +1,164 @@
+:root {
+  --site-bg: #f8fafd;
+  --site-surface: #ffffff;
+  --site-soft: #f1f5f9;
+  --site-border: #d9e0ea;
+  --site-text: #202124;
+  --site-muted: #5f6368;
+  --site-subtle: #7a828e;
+  --site-brand: #1a73e8;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --site-bg: #101418;
+  --site-surface: #171c22;
+  --site-soft: #20262e;
+  --site-border: #303943;
+  --site-text: #eef2f7;
+  --site-muted: #b7c0ca;
+  --site-subtle: #8b96a3;
+  --site-brand: #8ab4f8;
+}
+
+html[data-theme="dark"] body {
+  background: var(--site-bg) !important;
+  color: var(--site-text) !important;
+}
+
+html[data-theme="dark"] .bg-white,
+html[data-theme="dark"] .bg-slate-50 {
+  background-color: var(--site-surface) !important;
+}
+
+html[data-theme="dark"] .bg-slate-100,
+html[data-theme="dark"] .bg-slate-200,
+html[data-theme="dark"] .bg-indigo-50,
+html[data-theme="dark"] .bg-sky-50,
+html[data-theme="dark"] .bg-sky-100,
+html[data-theme="dark"] .bg-emerald-50,
+html[data-theme="dark"] .bg-emerald-100,
+html[data-theme="dark"] .bg-rose-50,
+html[data-theme="dark"] .bg-red-50,
+html[data-theme="dark"] .bg-amber-50 {
+  background-color: var(--site-soft) !important;
+}
+
+html[data-theme="dark"] .border,
+html[data-theme="dark"] .border-t,
+html[data-theme="dark"] .border-b,
+html[data-theme="dark"] .border-slate-100,
+html[data-theme="dark"] .border-slate-200,
+html[data-theme="dark"] .border-slate-300,
+html[data-theme="dark"] .border-indigo-100,
+html[data-theme="dark"] .border-sky-100,
+html[data-theme="dark"] .border-emerald-100,
+html[data-theme="dark"] .border-emerald-200,
+html[data-theme="dark"] .border-rose-100,
+html[data-theme="dark"] .border-red-100,
+html[data-theme="dark"] .border-amber-100 {
+  border-color: var(--site-border) !important;
+}
+
+html[data-theme="dark"] .text-slate-400,
+html[data-theme="dark"] .text-slate-500,
+html[data-theme="dark"] .text-slate-600,
+html[data-theme="dark"] .text-slate-700,
+html[data-theme="dark"] .text-indigo-800,
+html[data-theme="dark"] .text-indigo-900,
+html[data-theme="dark"] .prose p,
+html[data-theme="dark"] .prose blockquote {
+  color: var(--site-muted) !important;
+}
+
+html[data-theme="dark"] .text-slate-900,
+html[data-theme="dark"] .text-[#202124],
+html[data-theme="dark"] .prose h1,
+html[data-theme="dark"] .prose h2,
+html[data-theme="dark"] .prose h3 {
+  color: var(--site-text) !important;
+}
+
+html[data-theme="dark"] .text-indigo-600,
+html[data-theme="dark"] .text-indigo-700,
+html[data-theme="dark"] .text-sky-500,
+html[data-theme="dark"] .text-sky-600 {
+  color: var(--site-brand) !important;
+}
+
+html[data-theme="dark"] .text-emerald-700 {
+  color: #86efac !important;
+}
+
+html[data-theme="dark"] .text-amber-700 {
+  color: #facc15 !important;
+}
+
+html[data-theme="dark"] .text-rose-700,
+html[data-theme="dark"] .text-red-700 {
+  color: #fca5a5 !important;
+}
+
+html[data-theme="dark"] .quiz-option.correct {
+  background: #0f2f24 !important;
+  border-color: #34d399 !important;
+  color: #d1fae5 !important;
+}
+
+html[data-theme="dark"] .quiz-option.wrong {
+  background: #3a1719 !important;
+  border-color: #f87171 !important;
+  color: #fee2e2 !important;
+}
+
+html[data-theme="dark"] .lesson-prose p,
+html[data-theme="dark"] .lesson-prose li,
+html[data-theme="dark"] .lesson-prose td,
+html[data-theme="dark"] .lesson-prose blockquote {
+  color: var(--site-muted) !important;
+}
+
+html[data-theme="dark"] .lesson-prose h2,
+html[data-theme="dark"] .lesson-prose h3,
+html[data-theme="dark"] .lesson-prose strong,
+html[data-theme="dark"] .lesson-prose th {
+  color: var(--site-text) !important;
+}
+
+html[data-theme="dark"] .lesson-prose th,
+html[data-theme="dark"] .lesson-prose code {
+  background: var(--site-soft) !important;
+}
+
+html[data-theme="dark"] .lesson-prose th,
+html[data-theme="dark"] .lesson-prose td {
+  border-color: var(--site-border) !important;
+}
+
+html[data-theme="dark"] .lesson-prose code {
+  color: #c4b5fd !important;
+}
+
+.site-control,
+.site-seg {
+  border: 1px solid var(--site-border);
+  background: var(--site-surface);
+  color: var(--site-muted);
+  transition: background .12s ease, color .12s ease, border-color .12s ease;
+}
+
+.site-control:hover,
+.site-seg:hover {
+  background: var(--site-soft);
+  color: var(--site-text);
+}
+
+.site-seg.active {
+  background: var(--site-brand);
+  border-color: var(--site-brand);
+  color: #fff;
+}
+
+html[data-theme="dark"] .site-seg.active {
+  color: #102033;
+}

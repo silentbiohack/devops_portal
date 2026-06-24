@@ -38,8 +38,68 @@
         - "7946/tcp"
         - "7946/udp"
         - "4789/udp"
+        - "2049/tcp"
+        - "111/tcp"
+        - "111/udp"
       ignore_errors: yes
 
+- name: Set up NFS server on manager (shared data storage)
+  hosts: manager
+  become: yes
+  tasks:
+    - name: Install NFS server
+      apt:
+        name: nfs-kernel-server
+        state: present
+
+    - name: Create shared data directory
+      file:
+        path: /mnt/devops-news-data
+        state: directory
+        mode: '0777'
+
+    - name: Export shared data directory
+      lineinfile:
+        path: /etc/exports
+        line: "/mnt/devops-news-data 192.168.10.0/24(rw,sync,no_subtree_check,no_root_squash)"
+        create: yes
+
+    - name: Apply NFS exports
+      command: exportfs -ra
+
+    - name: Ensure NFS server is running and enabled
+      service:
+        name: nfs-kernel-server
+        state: restarted
+        enabled: yes
+
+- name: Mount shared data storage on workers
+  hosts: workers
+  become: yes
+  tasks:
+    - name: Install NFS client
+      apt:
+        name: nfs-common
+        state: present
+
+    - name: Create mount point
+      file:
+        path: /mnt/devops-news-data
+        state: directory
+        mode: '0777'
+
+    - name: Mount NFS share from manager
+      mount:
+        path: /mnt/devops-news-data
+        src: "{{ hostvars[groups['manager'][0]].ansible_host }}:/mnt/devops-news-data"
+        fstype: nfs
+        opts: rw,sync
+        state: mounted
+
+- name: Deploy application code and secrets to all nodes
+  hosts: swarm_nodes
+  become: yes
+  tasks:
     - name: Ensure project directories exist
       file:
         path: "/home/devops/devops-project/{{ item }}"
@@ -50,10 +110,10 @@
         - app
         - docker
 
-    - name: Copy index.html
+    - name: Copy application source
       copy:
-        src: "{{ playbook_dir }}/../app/index.html"
-        dest: /home/devops/devops-project/app/index.html
+        src: "{{ playbook_dir }}/../app/"
+        dest: /home/devops/devops-project/app/
         owner: devops
         group: devops
 
@@ -71,8 +131,24 @@
         owner: devops
         group: devops
 
-    - name: Build custom Nginx image
-      command: docker build -t custom-nginx:latest -f docker/Dockerfile .
+    - name: Ensure secrets directory exists
+      file:
+        path: /opt/devops-news
+        state: directory
+        owner: devops
+        group: devops
+        mode: '0700'
+
+    - name: Deploy environment secrets file
+      copy:
+        src: /home/devops/secrets/.env
+        dest: /opt/devops-news/.env
+        owner: devops
+        group: devops
+        mode: '0600'
+
+    - name: Build devops-news image
+      command: docker build -t devops-news:latest -f docker/Dockerfile .
       args:
         chdir: /home/devops/devops-project
 
@@ -108,7 +184,15 @@
   hosts: manager
   become: yes
   tasks:
-    - name: Deploy webapp stack
-      command: docker stack deploy -c /home/devops/devops-project/stack.yml webapp
+    - name: Remove previous demo stack if present
+      command: docker stack rm webapp
+      ignore_errors: yes
+
+    - name: Wait for old stack network to be removed
+      command: docker network prune -f
+      ignore_errors: yes
+
+    - name: Deploy news stack
+      command: docker stack deploy -c /home/devops/devops-project/stack.yml news
       args:
         chdir: /home/devops/devops-project

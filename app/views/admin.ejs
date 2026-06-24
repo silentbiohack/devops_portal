@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    body { font-family: Inter, system-ui, -apple-system, sans-serif; }
+    .logo-font { font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; letter-spacing: -0.02em; }
+    .form-input { transition: border-color .1s ease, box-shadow .1s ease; }
+    .form-input:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgb(79 70 229 / .12); outline: none; }
+    .admin-table th { font-weight: 700; font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; color: #64748b; }
+    .admin-tab.active { background: #4f46e5; color: #fff; border-color: #4f46e5; }
+    .prose-preview h2 { font-size: 1.1rem; font-weight: 700; margin: .9rem 0 .35rem; }
+    .prose-preview pre { background: #0f172a; color: #e0e7ff; padding: .85rem; border-radius: .75rem; overflow: auto; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-900">
+  <div class="bg-slate-950 text-white">
+    <div class="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-x-3">
+        <div class="w-8 h-8 bg-indigo-600 rounded-xl flex items-center justify-center">
+          <i class="fa-solid fa-infinity text-white"></i>
+        </div>
+        <span class="logo-font text-xl">DevOps News</span>
+        <span class="px-2 py-0.5 text-xs bg-white/10 rounded-full">АДМИН</span>
+      </div>
+      <div class="flex items-center gap-x-3 text-sm">
+        <a href="/" class="text-slate-300 hover:text-white flex items-center gap-x-1.5">
+          <i class="fa-solid fa-globe"></i>
+          <span class="hidden sm:inline">Открыть сайт</span>
+        </a>
+        <form method="POST" action="<%= adminPath %>/logout" class="m-0">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button type="submit" class="flex items-center gap-x-2 bg-white/10 hover:bg-white/20 px-4 py-1.5 rounded-xl">
+            <i class="fa-solid fa-sign-out-alt"></i>
+            <span>Выйти</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <main class="max-w-7xl mx-auto px-6 py-8">
+    <div class="flex flex-wrap items-end justify-between gap-4 mb-6">
+      <div>
+        <h1 class="text-3xl font-semibold tracking-tight">Админ-панель</h1>
+        <p class="text-slate-500 text-sm">Статьи, уроки курса и тренажёры управляются отдельно.</p>
+      </div>
+      <div class="flex rounded-2xl bg-white border border-slate-200 p-1">
+        <button type="button" class="admin-tab active px-4 py-2 rounded-xl text-sm font-semibold border border-transparent" data-panel-target="articles-panel">Статьи</button>
+        <button type="button" class="admin-tab px-4 py-2 rounded-xl text-sm font-semibold border border-transparent" data-panel-target="learning-panel">Обучение</button>
+      </div>
+    </div>
+
+    <% if (msg) { %>
+      <div class="mb-6 px-5 py-3 bg-emerald-100 border border-emerald-200 text-emerald-800 rounded-2xl text-sm flex items-center gap-x-2">
+        <i class="fa-solid fa-check-circle"></i>
+        <span><%= decodeURIComponent(msg) %></span>
+      </div>
+    <% } %>
+
+    <section id="articles-panel" data-admin-panel>
+      <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+        <form id="article-form" method="POST" action="<%= adminPath %>/create" class="xl:col-span-5 bg-white border border-slate-200 rounded-2xl p-6">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <input type="hidden" name="id" id="article-edit-id">
+
+          <div class="flex items-start justify-between gap-4 mb-5">
+            <div>
+              <h2 id="article-form-title" class="text-xl font-semibold">Новая статья</h2>
+              <p class="text-xs text-slate-500">Markdown-контент для раздела материалов.</p>
+            </div>
+            <button type="button" onclick="resetArticleForm()" class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-500">Сброс</button>
+          </div>
+
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">Заголовок</label>
+              <input type="text" name="title" id="article-title" required class="form-input w-full border border-slate-300 rounded-xl px-4 py-3">
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1.5">Категория</label>
+                <select name="category" id="article-category" class="form-input w-full border border-slate-300 rounded-xl px-4 py-3 bg-white">
+                  <% categories.forEach(cat => { %>
+                    <option value="<%= cat %>"><%= cat %></option>
+                  <% }) %>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1.5">Дата</label>
+                <input type="date" name="date" id="article-date" value="<%= new Date().toISOString().split('T')[0] %>" class="form-input w-full border border-slate-300 rounded-xl px-4 py-3">
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">Краткое описание</label>
+              <input type="text" name="summary" id="article-summary" class="form-input w-full border border-slate-300 rounded-xl px-4 py-3">
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <label class="block text-xs font-semibold text-slate-500">Текст статьи</label>
+                <button type="button" onclick="previewMarkdown('article-content', 'article-preview-area', 'article-preview-content')" class="text-xs px-3 py-1 rounded-xl bg-indigo-50 text-indigo-700 font-semibold">Предпросмотр</button>
+              </div>
+              <textarea name="content" id="article-content" rows="13" required class="form-input w-full border border-slate-300 rounded-xl px-4 py-3 font-mono text-sm"></textarea>
+            </div>
+            <div id="article-preview-area" class="hidden border border-slate-200 rounded-xl p-4 bg-slate-50">
+              <div id="article-preview-content" class="prose-preview text-sm text-slate-700 max-h-64 overflow-auto"></div>
+            </div>
+            <div class="flex gap-3">
+              <button type="submit" id="article-submit-btn" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold">Опубликовать статью</button>
+              <button type="button" id="article-cancel-btn" onclick="resetArticleForm()" class="hidden px-5 py-3 border border-slate-200 rounded-xl font-semibold text-slate-600">Отмена</button>
+            </div>
+          </div>
+        </form>
+
+        <div class="xl:col-span-7 bg-white border border-slate-200 rounded-2xl overflow-hidden">
+          <div class="px-5 py-4 flex items-center border-b border-slate-200">
+            <div class="font-semibold">Все статьи</div>
+            <div class="ml-auto text-xs bg-slate-100 px-3 py-1 rounded-full text-slate-500"><%= articles.length %> шт.</div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="bg-slate-50 text-left border-b">
+                  <th class="admin-table px-5 py-3">Название</th>
+                  <th class="admin-table px-4 py-3 w-32">Категория</th>
+                  <th class="admin-table px-4 py-3 w-28">Дата</th>
+                  <th class="admin-table px-5 py-3 w-32 text-right">Действия</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y text-sm">
+                <% articles.forEach(article => { %>
+                  <tr class="hover:bg-slate-50">
+                    <td class="px-5 py-3">
+                      <div class="font-medium"><%= article.title %></div>
+                      <div class="text-[11px] text-slate-400 truncate max-w-md"><%= article.slug %></div>
+                    </td>
+                    <td class="px-4 py-3 text-xs text-slate-600"><%= article.category %></td>
+                    <td class="px-4 py-3 text-xs text-slate-500"><%= article.date %></td>
+                    <td class="px-5 py-3 text-right">
+                      <div class="inline-flex gap-1.5">
+                        <button type="button" data-article="<%- encodeURIComponent(JSON.stringify(article)) %>" onclick="editArticleFromButton(this)" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-indigo-600 hover:bg-indigo-50">Править</button>
+                        <form method="POST" action="<%= adminPath %>/delete/<%= article.id %>" onsubmit="return confirm('Удалить статью «<%= article.title %>»?');">
+                          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                          <button type="submit" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-red-500 hover:bg-red-50">
+                            <i class="fa-solid fa-trash"></i>
+                          </button>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="learning-panel" data-admin-panel class="hidden">
+      <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+        <form id="lesson-form" method="POST" action="<%= adminPath %>/learning/create" class="xl:col-span-6 bg-white border border-slate-200 rounded-2xl p-6">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <input type="hidden" name="id" id="lesson-edit-id">
+
+          <div class="flex items-start justify-between gap-4 mb-5">
+            <div>
+              <h2 id="lesson-form-title" class="text-xl font-semibold">Новый урок</h2>
+              <p class="text-xs text-slate-500">Курс, тренажёр и квиз редактируются здесь.</p>
+            </div>
+            <button type="button" onclick="resetLessonForm()" class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-500">Сброс</button>
+          </div>
+
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">Название урока</label>
+              <input type="text" name="title" id="lesson-title" required class="form-input w-full border border-slate-300 rounded-xl px-4 py-3">
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1.5">Модуль</label>
+                <input type="text" name="module" id="lesson-module" list="learning-modules" class="form-input w-full border border-slate-300 rounded-xl px-4 py-3">
+                <datalist id="learning-modules">
+                  <% learningCategories.forEach(cat => { %>
+                    <option value="<%= cat %>"></option>
+                  <% }) %>
+                </datalist>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1.5">Неделя</label>
+                <input type="text" name="week" id="lesson-week" class="form-input w-full border border-slate-300 rounded-xl px-4 py-3">
+              </div>
+            </div>
+            <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1.5">Номер</label>
+                <input type="text" name="lessonNumber" id="lesson-number" class="form-input w-full border border-slate-300 rounded-xl px-3 py-2.5">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1.5">Модуль #</label>
+                <input type="number" name="moduleOrder" id="lesson-module-order" value="1" min="1" class="form-input w-full border border-slate-300 rounded-xl px-3 py-2.5">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1.5">Урок #</label>
+                <input type="number" name="lessonOrder" id="lesson-order" value="1" min="1" class="form-input w-full border border-slate-300 rounded-xl px-3 py-2.5">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1.5">Время</label>
+                <input type="text" name="duration" id="lesson-duration" value="7 минут" class="form-input w-full border border-slate-300 rounded-xl px-3 py-2.5">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1.5">Статус</label>
+                <select name="status" id="lesson-status" class="form-input w-full border border-slate-300 rounded-xl px-3 py-2.5 bg-white">
+                  <option value="published">Опубликован</option>
+                  <option value="draft">Черновик</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">Краткое описание</label>
+              <input type="text" name="summary" id="lesson-summary" class="form-input w-full border border-slate-300 rounded-xl px-4 py-3">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">Цели урока Markdown</label>
+              <textarea name="objectives" id="lesson-objectives" rows="4" class="form-input w-full border border-slate-300 rounded-xl px-4 py-3 font-mono text-sm"></textarea>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <label class="block text-xs font-semibold text-slate-500">Теория Markdown</label>
+                <button type="button" onclick="previewMarkdown('lesson-content', 'lesson-preview-area', 'lesson-preview-content')" class="text-xs px-3 py-1 rounded-xl bg-indigo-50 text-indigo-700 font-semibold">Предпросмотр</button>
+              </div>
+              <textarea name="content" id="lesson-content" rows="13" required class="form-input w-full border border-slate-300 rounded-xl px-4 py-3 font-mono text-sm"></textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">Практика / тренажёр Markdown</label>
+              <textarea name="practice" id="lesson-practice" rows="7" class="form-input w-full border border-slate-300 rounded-xl px-4 py-3 font-mono text-sm"></textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">Дополнительные материалы Markdown</label>
+              <textarea name="resources" id="lesson-resources" rows="4" class="form-input w-full border border-slate-300 rounded-xl px-4 py-3 font-mono text-sm"></textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-1.5">Квиз JSON</label>
+              <textarea name="quizJson" id="lesson-quiz" rows="10" class="form-input w-full border border-slate-300 rounded-xl px-4 py-3 font-mono text-xs" placeholder='[{"question":"...","options":["...","..."],"correctIndex":0,"explanation":"..."}]'></textarea>
+            </div>
+            <div id="lesson-preview-area" class="hidden border border-slate-200 rounded-xl p-4 bg-slate-50">
+              <div id="lesson-preview-content" class="prose-preview text-sm text-slate-700 max-h-64 overflow-auto"></div>
+            </div>
+            <div class="flex gap-3">
+              <button type="submit" id="lesson-submit-btn" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold">Опубликовать урок</button>
+              <button type="button" id="lesson-cancel-btn" onclick="resetLessonForm()" class="hidden px-5 py-3 border border-slate-200 rounded-xl font-semibold text-slate-600">Отмена</button>
+            </div>
+          </div>
+        </form>
+
+        <div class="xl:col-span-6 bg-white border border-slate-200 rounded-2xl overflow-hidden">
+          <div class="px-5 py-4 flex items-center border-b border-slate-200">
+            <div class="font-semibold">Уроки курса</div>
+            <div class="ml-auto text-xs bg-slate-100 px-3 py-1 rounded-full text-slate-500"><%= learningLessons.length %> шт.</div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="bg-slate-50 text-left border-b">
+                  <th class="admin-table px-5 py-3">Урок</th>
+                  <th class="admin-table px-4 py-3 w-28">Статус</th>
+                  <th class="admin-table px-5 py-3 w-32 text-right">Действия</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y text-sm">
+                <% learningLessons.forEach(lesson => { %>
+                  <tr class="hover:bg-slate-50">
+                    <td class="px-5 py-3">
+                      <div class="text-xs text-slate-400"><%= lesson.module %> · <%= lesson.lessonNumber %></div>
+                      <div class="font-medium"><%= lesson.title %></div>
+                      <div class="text-[11px] text-slate-400 truncate max-w-md"><%= lesson.slug %></div>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="text-xs px-2 py-1 rounded-full <%= lesson.status === 'draft' ? 'bg-amber-50 text-amber-700' : 'bg-emerald-50 text-emerald-700' %>">
+                        <%= lesson.status === 'draft' ? 'Черновик' : 'Опубликован' %>
+                      </span>
+                    </td>
+                    <td class="px-5 py-3 text-right">
+                      <div class="inline-flex gap-1.5">
+                        <a href="/learning/<%= lesson.slug %>" target="_blank" rel="noopener" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:bg-slate-100">Открыть</a>
+                        <button type="button" data-lesson="<%- encodeURIComponent(JSON.stringify(lesson)) %>" onclick="editLessonFromButton(this)" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-indigo-600 hover:bg-indigo-50">Править</button>
+                        <form method="POST" action="<%= adminPath %>/learning/delete/<%= lesson.id %>" onsubmit="return confirm('Удалить урок «<%= lesson.title %>»?');">
+                          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                          <button type="submit" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-red-500 hover:bg-red-50">
+                            <i class="fa-solid fa-trash"></i>
+                          </button>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const csrfToken = '<%= csrfToken %>';
+
+    function activatePanel(panelId) {
+      document.querySelectorAll('[data-admin-panel]').forEach(panel => {
+        panel.classList.toggle('hidden', panel.id !== panelId);
+      });
+      document.querySelectorAll('[data-panel-target]').forEach(button => {
+        button.classList.toggle('active', button.dataset.panelTarget === panelId);
+      });
+      history.replaceState(null, '', `#${panelId.replace('-panel', '')}`);
+    }
+
+    function editArticleFromButton(button) {
+      editArticle(JSON.parse(decodeURIComponent(button.dataset.article || '{}')));
+    }
+
+    function editArticle(article) {
+      document.getElementById('article-form-title').textContent = 'Редактирование статьи';
+      document.getElementById('article-submit-btn').textContent = 'Сохранить статью';
+      document.getElementById('article-edit-id').value = article.id;
+      document.getElementById('article-title').value = article.title || '';
+      document.getElementById('article-summary').value = article.summary || '';
+      document.getElementById('article-content').value = article.content || '';
+      document.getElementById('article-category').value = article.category || 'Основы';
+      document.getElementById('article-date').value = article.date || '';
+      document.getElementById('article-form').action = `<%= adminPath %>/update/${article.id}`;
+      document.getElementById('article-cancel-btn').classList.remove('hidden');
+      activatePanel('articles-panel');
+      document.getElementById('article-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function resetArticleForm() {
+      const form = document.getElementById('article-form');
+      form.reset();
+      form.action = '<%= adminPath %>/create';
+      document.getElementById('article-form-title').textContent = 'Новая статья';
+      document.getElementById('article-submit-btn').textContent = 'Опубликовать статью';
+      document.getElementById('article-cancel-btn').classList.add('hidden');
+      document.getElementById('article-preview-area').classList.add('hidden');
+    }
+
+    function editLessonFromButton(button) {
+      editLesson(JSON.parse(decodeURIComponent(button.dataset.lesson || '{}')));
+    }
+
+    function editLesson(lesson) {
+      document.getElementById('lesson-form-title').textContent = 'Редактирование урока';
+      document.getElementById('lesson-submit-btn').textContent = 'Сохранить урок';
+      document.getElementById('lesson-edit-id').value = lesson.id;
+      document.getElementById('lesson-title').value = lesson.title || '';
+      document.getElementById('lesson-summary').value = lesson.summary || '';
+      document.getElementById('lesson-module').value = lesson.module || '';
+      document.getElementById('lesson-week').value = lesson.week || '';
+      document.getElementById('lesson-number').value = lesson.lessonNumber || '';
+      document.getElementById('lesson-module-order').value = lesson.moduleOrder || 1;
+      document.getElementById('lesson-order').value = lesson.lessonOrder || 1;
+      document.getElementById('lesson-duration').value = lesson.duration || '';
+      document.getElementById('lesson-status').value = lesson.status || 'published';
+      document.getElementById('lesson-objectives').value = lesson.objectives || '';
+      document.getElementById('lesson-content').value = lesson.content || '';
+      document.getElementById('lesson-practice').value = lesson.practice || '';
+      document.getElementById('lesson-resources').value = lesson.resources || '';
+      document.getElementById('lesson-quiz').value = JSON.stringify(lesson.quiz || [], null, 2);
+      document.getElementById('lesson-form').action = `<%= adminPath %>/learning/update/${lesson.id}`;
+      document.getElementById('lesson-cancel-btn').classList.remove('hidden');
+      activatePanel('learning-panel');
+      document.getElementById('lesson-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function resetLessonForm() {
+      const form = document.getElementById('lesson-form');
+      form.reset();
+      form.action = '<%= adminPath %>/learning/create';
+      document.getElementById('lesson-form-title').textContent = 'Новый урок';
+      document.getElementById('lesson-submit-btn').textContent = 'Опубликовать урок';
+      document.getElementById('lesson-cancel-btn').classList.add('hidden');
+      document.getElementById('lesson-preview-area').classList.add('hidden');
+    }
+
+    async function previewMarkdown(textareaId, areaId, contentId) {
+      const content = document.getElementById(textareaId).value.trim();
+      if (!content) {
+        alert('Заполните поле Markdown');
+        return;
+      }
+
+      const area = document.getElementById(areaId);
+      const target = document.getElementById(contentId);
+      try {
+        const res = await fetch('<%= adminPath %>/preview', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': csrfToken
+          },
+          body: JSON.stringify({ content, _csrf: csrfToken })
+        });
+        const data = await res.json();
+        target.innerHTML = data.html || '<em>Пусто</em>';
+      } catch (error) {
+        target.textContent = 'Не удалось загрузить предпросмотр';
+      }
+      area.classList.remove('hidden');
+    }
+
+    document.querySelectorAll('[data-panel-target]').forEach(button => {
+      button.addEventListener('click', () => activatePanel(button.dataset.panelTarget));
+    });
+
+    if (location.hash === '#learning') {
+      activatePanel('learning-panel');
+    }
+  </script>
+</body>
+</html>

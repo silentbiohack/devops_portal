@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <script>
+    (function () {
+      const theme = localStorage.getItem('devops-theme') || 'light';
+      const lang = localStorage.getItem('devops-lang') || 'ru';
+      document.documentElement.dataset.theme = theme;
+      document.documentElement.lang = lang === 'kk' ? 'kk' : 'ru';
+    })();
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500&display=swap');
+
+    :root {
+      color-scheme: light;
+      --bg: #f8fafd;
+      --surface: #ffffff;
+      --surface-soft: #f1f5f9;
+      --surface-hover: #eef2f7;
+      --border: #d9e0ea;
+      --text: #202124;
+      --muted: #5f6368;
+      --subtle: #7a828e;
+      --brand: #1a73e8;
+      --brand-soft: #e8f0fe;
+      --chip-active-text: #ffffff;
+      --shadow: 0 4px 12px -4px rgb(15 23 42 / 0.2);
+    }
+
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #101418;
+      --surface: #171c22;
+      --surface-soft: #20262e;
+      --surface-hover: #26303a;
+      --border: #303943;
+      --text: #eef2f7;
+      --muted: #b7c0ca;
+      --subtle: #8b96a3;
+      --brand: #8ab4f8;
+      --brand-soft: #18395f;
+      --chip-active-text: #102033;
+      --shadow: 0 12px 28px -18px rgb(0 0 0 / 0.8);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Roboto', system-ui, -apple-system, sans-serif;
+      transition: background .16s ease, color .16s ease;
+    }
+
+    .gn-header {
+      font-family: 'Google Sans', 'Roboto', system-ui, sans-serif;
+    }
+
+    .surface {
+      background: var(--surface);
+      border-color: var(--border);
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .subtle {
+      color: var(--subtle);
+    }
+
+    .news-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      min-height: 168px;
+      display: flex;
+      flex-direction: column;
+      transition: box-shadow .15s ease, transform .1s ease, background .16s ease, border-color .16s ease;
+    }
+
+    .news-card:hover {
+      box-shadow: var(--shadow);
+      transform: translateY(-1px);
+    }
+
+    .gn-source {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    .gn-time {
+      font-size: 13px;
+      color: var(--subtle);
+    }
+
+    .gn-title {
+      font-size: 17px;
+      line-height: 1.35;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .gn-snippet {
+      font-size: 14px;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .line-clamp-3 {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .section-header {
+      font-size: 17px;
+      font-weight: 500;
+      letter-spacing: .1px;
+      color: var(--text);
+    }
+
+    .filter-chip,
+    .icon-button,
+    .text-button,
+    .seg-button {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      transition: background .12s ease, color .12s ease, border-color .12s ease;
+    }
+
+    .filter-chip {
+      font-size: 13px;
+      padding: 6px 14px;
+      white-space: nowrap;
+      border-radius: 999px;
+      font-weight: 500;
+    }
+
+    .filter-chip:hover,
+    .icon-button:hover,
+    .text-button:hover,
+    .seg-button:hover {
+      background: var(--surface-hover);
+      color: var(--text);
+    }
+
+    .filter-chip.active,
+    .seg-button.active {
+      background: var(--brand);
+      border-color: var(--brand);
+      color: var(--chip-active-text);
+    }
+
+    .story-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 14px;
+    }
+
+    @media (min-width: 1024px) {
+      .story-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .live-dot {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    .live-badge {
+      animation: liveBadgePulse 1.8s ease-in-out infinite;
+      box-shadow: 0 0 0 0 rgb(26 115 232 / 0.34);
+    }
+
+    @keyframes liveBadgePulse {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgb(26 115 232 / 0.34);
+      }
+      65% {
+        transform: scale(1.04);
+        box-shadow: 0 0 0 8px rgb(26 115 232 / 0);
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgb(26 115 232 / 0);
+      }
+    }
+
+    .gn-link {
+      color: inherit;
+    }
+
+    .gn-link:hover {
+      color: var(--brand);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .mini-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      color: var(--text);
+      transition: background .12s ease, border-color .12s ease;
+    }
+
+    .mini-card:hover {
+      background: var(--surface-hover);
+    }
+
+    .search-input {
+      background: var(--surface-soft);
+      color: var(--text);
+      border: 1px solid transparent;
+    }
+
+    .search-input:hover,
+    .search-input:focus {
+      background: var(--surface);
+      border-color: var(--border);
+    }
+
+    .search-input::placeholder {
+      color: var(--subtle);
+    }
+
+    .telegram-widget {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 60;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 999px;
+      background: #229ed9;
+      color: white;
+      box-shadow: 0 14px 32px -18px rgb(15 23 42 / .7);
+      font-size: 14px;
+      font-weight: 600;
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+
+    .telegram-widget:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 36px -18px rgb(15 23 42 / .8);
+    }
+
+    @media (max-width: 640px) {
+      .telegram-widget span {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="surface border-b sticky top-0 z-50">
+    <div class="max-w-screen-xl mx-auto px-4">
+      <div class="min-h-14 py-2 flex flex-wrap items-center gap-3">
+        <a href="/" class="flex items-center gap-x-2.5 min-w-[160px]">
+          <div class="flex items-center justify-center w-9 h-9 bg-[#1a73e8] rounded-full">
+            <i class="fa-solid fa-infinity text-white text-[21px]"></i>
+          </div>
+          <span class="gn-header text-[22px] font-medium tracking-[-0.3px]">DevOps News</span>
+        </a>
+
+        <div class="flex-1 min-w-[220px] max-w-[520px]">
+          <div class="relative">
+            <input id="search-input"
+                   type="text"
+                   class="search-input w-full pl-11 pr-4 py-2.5 rounded-full text-[15px] outline-none"
+                   data-i18n-placeholder="searchPlaceholder"
+                   placeholder="Поиск по DevOps новостям...">
+            <i class="fa-solid fa-search absolute left-4 top-3 muted"></i>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 ml-auto">
+          <a href="/learning" class="text-button hidden md:flex items-center gap-x-2 px-4 py-2 text-sm font-medium rounded-full">
+            <i class="fa-solid fa-graduation-cap"></i>
+            <span>Обучение</span>
+          </a>
+
+          <div class="flex items-center rounded-full overflow-hidden" aria-label="Language">
+            <button type="button" class="seg-button px-3 py-2 text-xs font-semibold" data-lang-option="ru">RU</button>
+            <button type="button" class="seg-button px-3 py-2 text-xs font-semibold border-l-0" data-lang-option="kk">KZ</button>
+          </div>
+
+          <button id="theme-toggle" type="button" class="icon-button w-10 h-10 rounded-full" aria-label="Toggle theme" title="Theme">
+            <i class="fa-solid fa-moon"></i>
+          </button>
+
+          <button onclick="refreshLiveNews()"
+                  class="text-button flex items-center gap-x-2 px-4 py-2 text-sm font-medium rounded-full">
+            <i class="fa-solid fa-sync-alt"></i>
+            <span class="hidden sm:inline" data-i18n="refresh">Обновить</span>
+          </button>
+
+          <a href="/about" class="icon-button w-10 h-10 rounded-full flex items-center justify-center" aria-label="About">
+            <i class="fa-solid fa-info-circle"></i>
+          </a>
+
+          <a href="https://t.me/devops_news_bot" target="_blank" rel="noopener" class="icon-button w-10 h-10 rounded-full flex items-center justify-center" aria-label="Telegram bot">
+            <i class="fa-brands fa-telegram text-[#229ed9]"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="border-t" style="border-color: var(--border)">
+      <div class="max-w-screen-xl mx-auto px-4 py-2.5 overflow-x-auto">
+        <div class="flex items-center gap-x-2" id="filter-chips">
+          <button data-filter="all" class="filter-chip active" data-i18n="all">Все</button>
+          <button data-filter="kubernetes" class="filter-chip">Kubernetes</button>
+          <button data-filter="docker" class="filter-chip">Docker</button>
+          <button data-filter="ci/cd" class="filter-chip">CI/CD</button>
+          <button data-filter="terraform" class="filter-chip">Terraform</button>
+          <button data-filter="monitoring" class="filter-chip" data-i18n="monitoring">Мониторинг</button>
+          <button data-filter="gitops" class="filter-chip">GitOps</button>
+          <button data-filter="security" class="filter-chip" data-i18n="security">Безопасность</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-screen-xl mx-auto px-4 pt-5 pb-10">
+    <section class="flex flex-wrap items-center justify-between gap-3 mb-3">
+      <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+        <div class="flex items-center gap-x-2">
+          <h1 class="section-header" data-i18n="latest">Последние новости DevOps</h1>
+          <span class="live-badge inline-flex items-center gap-x-1 px-2 py-px text-[11px] font-semibold rounded" style="background: var(--brand-soft); color: var(--brand)">
+            <span class="live-dot w-1.5 h-1.5 rounded-full inline-block" style="background: var(--brand)"></span>
+            LIVE
+          </span>
+        </div>
+        <div id="last-updated" class="text-xs subtle font-medium" data-updated="<%= lastUpdated || '' %>">
+          <% if (lastUpdated) { %>
+            Обновлено: <%= new Date(lastUpdated).toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'}) %>
+          <% } else { %>
+            Загрузка...
+          <% } %>
+        </div>
+      </div>
+
+      <button onclick="refreshLiveNews(true)"
+              class="text-button text-xs px-3 py-1.5 rounded-full flex items-center gap-x-1.5">
+        <i class="fa-solid fa-redo text-[10px]"></i>
+        <span data-i18n="refreshNow">Обновить сейчас</span>
+      </button>
+    </section>
+
+    <section id="stories-container" class="story-grid" aria-live="polite">
+      <% if (liveNews && liveNews.length > 0) { %>
+        <% liveNews.slice(0, 18).forEach((item) => { %>
+          <article class="news-card" data-title="<%= item.title.toLowerCase() %>" data-source="<%= (item.source || '').toLowerCase() %>">
+            <div class="flex items-center gap-x-2 mb-2">
+              <span class="gn-source"><%= item.source %></span>
+              <span class="subtle">·</span>
+              <span class="gn-time" data-pubdate="<%= item.pubDate %>">
+                <%= new Date(item.pubDate).toLocaleDateString('ru-RU') %>
+              </span>
+            </div>
+
+            <a href="<%= item.link %>" target="_blank" rel="noopener" class="gn-link gn-title mb-2">
+              <%= item.title %>
+            </a>
+
+            <% if (item.summary) { %>
+              <p class="gn-snippet line-clamp-3 mb-auto"><%= item.summary %></p>
+            <% } %>
+
+            <div class="mt-3 pt-3 border-t flex items-center text-[12px] subtle" style="border-color: var(--border)">
+              <span data-i18n="openSource">Открыть источник</span>
+              <i class="fa-solid fa-external-link-alt ml-1.5 text-[10px]"></i>
+            </div>
+          </article>
+        <% }) %>
+      <% } else { %>
+        <div class="col-span-full p-8 text-center surface border rounded-2xl">
+          <p class="muted" data-i18n="loadingLive">Загрузка live-новостей из RSS...</p>
+        </div>
+      <% } %>
+    </section>
+
+    <section class="mt-9">
+      <div class="flex items-baseline justify-between mb-3">
+        <h2 class="section-header" data-i18n="deepDive">Для глубокого изучения</h2>
+        <a href="/learning" class="text-xs hover:underline" style="color: var(--brand)" data-i18n="allMaterials">Все материалы →</a>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+        <% if (learningLessons && learningLessons.length) { %>
+          <% learningLessons.forEach(item => { %>
+            <a href="/learning/<%= item.slug %>" class="mini-card p-3.5 text-sm flex flex-col">
+              <div class="flex-1">
+                <div class="text-[10px] uppercase tracking-wider subtle mb-1">Курс · <%= item.lessonNumber %></div>
+                <div class="font-medium leading-tight line-clamp-2"><%= item.title %></div>
+              </div>
+              <div class="mt-2 text-[11px] subtle">
+                <%= item.duration %> · тренажёр
+              </div>
+            </a>
+          <% }) %>
+        <% } %>
+        <% if (curatedArticles && curatedArticles.length) { %>
+          <% curatedArticles.forEach(item => { %>
+            <a href="/article/<%= item.slug %>" class="mini-card p-3.5 text-sm flex flex-col">
+              <div class="flex-1">
+                <div class="text-[10px] uppercase tracking-wider subtle mb-1"><%= item.category %></div>
+                <div class="font-medium leading-tight line-clamp-2"><%= item.title %></div>
+              </div>
+              <div class="mt-2 text-[11px] subtle">
+                <%= item.date %> · <%= item.author %>
+              </div>
+            </a>
+          <% }) %>
+        <% } %>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="surface border-t py-5 text-xs subtle">
+    <div class="max-w-screen-xl mx-auto px-4 flex flex-wrap items-center justify-between gap-y-1">
+      <div>DevOps News · 2026</div>
+      <a href="https://t.me/devops_news_bot" target="_blank" rel="noopener" class="hover:underline" style="color: var(--brand)">@devops_news_bot</a>
+    </div>
+  </footer>
+
+  <a href="https://t.me/devops_news_bot" target="_blank" rel="noopener" class="telegram-widget" aria-label="Telegram bot @devops_news_bot">
+    <i class="fa-brands fa-telegram text-xl"></i>
+    <span>@devops_news_bot</span>
+  </a>
+
+  <script>
+    const translations = {
+      ru: {
+        searchPlaceholder: 'Поиск по DevOps новостям...',
+        refresh: 'Обновить',
+        all: 'Все',
+        monitoring: 'Мониторинг',
+        security: 'Безопасность',
+        latest: 'Последние новости DevOps',
+        updated: 'Обновлено',
+        loading: 'Загрузка...',
+        refreshNow: 'Обновить сейчас',
+        openSource: 'Открыть источник',
+        loadingLive: 'Загрузка live-новостей из RSS...',
+        deepDive: 'Для глубокого изучения',
+        allMaterials: 'Все материалы →',
+        noNews: 'Новостей пока нет. Нажмите «Обновить сейчас».',
+        loaded: count => `Загружено ${count} новостей`,
+        failed: 'Не удалось обновить. Проверьте консоль или подключение.',
+        justNow: 'только что',
+        minutesAgo: count => `${count} мин назад`,
+        hoursAgo: count => `${count} ч назад`,
+        yesterday: 'вчера',
+        daysAgo: count => `${count} дн назад`,
+        themeLight: 'Светлая тема',
+        themeDark: 'Темная тема'
+      },
+      kk: {
+        searchPlaceholder: 'DevOps жаңалықтарынан іздеу...',
+        refresh: 'Жаңарту',
+        all: 'Барлығы',
+        monitoring: 'Мониторинг',
+        security: 'Қауіпсіздік',
+        latest: 'Соңғы DevOps жаңалықтары',
+        updated: 'Жаңартылды',
+        loading: 'Жүктелуде...',
+        refreshNow: 'Қазір жаңарту',
+        openSource: 'Дереккөзді ашу',
+        loadingLive: 'RSS-тен live жаңалықтар жүктелуде...',
+        deepDive: 'Терең оқу үшін',
+        allMaterials: 'Барлық материалдар →',
+        noNews: 'Әзірге жаңалық жоқ. «Қазір жаңарту» түймесін басыңыз.',
+        loaded: count => `${count} жаңалық жүктелді`,
+        failed: 'Жаңарту мүмкін болмады. Консольді немесе қосылымды тексеріңіз.',
+        justNow: 'жаңа ғана',
+        minutesAgo: count => `${count} мин бұрын`,
+        hoursAgo: count => `${count} сағ бұрын`,
+        yesterday: 'кеше',
+        daysAgo: count => `${count} күн бұрын`,
+        themeLight: 'Жарық тема',
+        themeDark: 'Қараңғы тема'
+      }
+    };
+
+    let currentLang = localStorage.getItem('devops-lang') || 'ru';
+    let currentTheme = localStorage.getItem('devops-theme') || 'light';
+    let currentFilter = 'all';
+    let currentSearch = '';
+    let allLiveItems = [];
+
+    function t(key, arg) {
+      const value = translations[currentLang][key] || translations.ru[key] || key;
+      return typeof value === 'function' ? value(arg) : value;
+    }
+
+    function escapeHtml(value = '') {
+      return String(value).replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[char]));
+    }
+
+    function setLanguage(lang) {
+      currentLang = lang === 'kk' ? 'kk' : 'ru';
+      localStorage.setItem('devops-lang', currentLang);
+      document.documentElement.lang = currentLang === 'kk' ? 'kk' : 'ru';
+
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        el.textContent = t(el.dataset.i18n);
+      });
+
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        el.setAttribute('placeholder', t(el.dataset.i18nPlaceholder));
+      });
+
+      document.querySelectorAll('[data-lang-option]').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.langOption === currentLang);
+      });
+
+      updateThemeButton();
+      updateLastUpdated();
+      updateAllTimes();
+      renderStories(allLiveItems.length ? allLiveItems : readCurrentCards());
+    }
+
+    function setTheme(theme) {
+      currentTheme = theme === 'dark' ? 'dark' : 'light';
+      localStorage.setItem('devops-theme', currentTheme);
+      document.documentElement.dataset.theme = currentTheme;
+      updateThemeButton();
+    }
+
+    function updateThemeButton() {
+      const button = document.getElementById('theme-toggle');
+      if (!button) return;
+      const isDark = currentTheme === 'dark';
+      button.innerHTML = `<i class="fa-solid ${isDark ? 'fa-sun' : 'fa-moon'}"></i>`;
+      button.setAttribute('aria-label', isDark ? t('themeLight') : t('themeDark'));
+      button.setAttribute('title', isDark ? t('themeLight') : t('themeDark'));
+    }
+
+    function updateLastUpdated(timestamp) {
+      const el = document.getElementById('last-updated');
+      if (!el) return;
+      const value = timestamp || el.dataset.updated;
+      if (!value) {
+        el.textContent = t('loading');
+        return;
+      }
+      el.dataset.updated = value;
+      const date = new Date(Number(value) || value);
+      el.textContent = `${t('updated')}: ${date.toLocaleTimeString(currentLang === 'kk' ? 'kk-KZ' : 'ru-RU', {hour:'2-digit', minute:'2-digit'})}`;
+    }
+
+    function timeAgo(dateStr) {
+      const date = new Date(dateStr);
+      const now = new Date();
+      const diffMs = now - date;
+      const diffMin = Math.floor(diffMs / 60000);
+      const diffHr = Math.floor(diffMin / 60);
+      const diffDay = Math.floor(diffHr / 24);
+
+      if (diffMin < 1) return t('justNow');
+      if (diffMin < 60) return t('minutesAgo', diffMin);
+      if (diffHr < 24) return t('hoursAgo', diffHr);
+      if (diffDay === 1) return t('yesterday');
+      if (diffDay < 7) return t('daysAgo', diffDay);
+      return date.toLocaleDateString(currentLang === 'kk' ? 'kk-KZ' : 'ru-RU', { day: 'numeric', month: 'short' });
+    }
+
+    function updateAllTimes() {
+      document.querySelectorAll('.gn-time[data-pubdate]').forEach(el => {
+        const value = el.getAttribute('data-pubdate');
+        if (value) el.textContent = timeAgo(value);
+      });
+    }
+
+    function readCurrentCards() {
+      return [...document.querySelectorAll('.news-card')].map(card => ({
+        title: card.querySelector('.gn-title')?.textContent.trim() || '',
+        link: card.querySelector('.gn-title')?.getAttribute('href') || '#',
+        source: card.querySelector('.gn-source')?.textContent.trim() || '',
+        pubDate: card.querySelector('.gn-time')?.getAttribute('data-pubdate') || new Date().toISOString(),
+        summary: card.querySelector('.gn-snippet')?.textContent.trim() || ''
+      }));
+    }
+
+    function renderStories(items, containerId = 'stories-container') {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+
+      if (!items || items.length === 0) {
+        container.innerHTML = `<div class="col-span-full p-8 text-center surface border rounded-2xl muted">${escapeHtml(t('noNews'))}</div>`;
+        return;
+      }
+
+      container.innerHTML = items.map(item => `
+        <article class="news-card" data-title="${escapeHtml((item.title || '').toLowerCase())}" data-source="${escapeHtml((item.source || '').toLowerCase())}">
+          <div class="flex items-center gap-x-2 mb-2">
+            <span class="gn-source">${escapeHtml(item.source || item.provider || 'RSS')}</span>
+            <span class="subtle">·</span>
+            <span class="gn-time" data-pubdate="${escapeHtml(item.pubDate || new Date().toISOString())}">${timeAgo(item.pubDate)}</span>
+          </div>
+          <a href="${escapeHtml(item.link || '#')}" target="_blank" rel="noopener noreferrer" class="gn-link gn-title mb-2">${escapeHtml(item.title)}</a>
+          ${item.summary ? `<p class="gn-snippet line-clamp-3 mb-auto">${escapeHtml(item.summary)}</p>` : ''}
+          <div class="mt-3 pt-3 border-t flex items-center text-[12px] subtle" style="border-color: var(--border)">
+            <span>${escapeHtml(t('openSource'))}</span>
+            <i class="fa-solid fa-external-link-alt ml-1.5 text-[10px]"></i>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function applyFilters() {
+      const cards = document.querySelectorAll('.news-card');
+      cards.forEach(card => {
+        const title = card.dataset.title || '';
+        const source = card.dataset.source || '';
+        const summary = card.querySelector('.gn-snippet')?.textContent.toLowerCase() || '';
+        const haystack = `${title} ${source} ${summary}`;
+        const matchesFilter = currentFilter === 'all' ||
+          haystack.includes(currentFilter) ||
+          (currentFilter === 'ci/cd' && (haystack.includes('ci') || haystack.includes('cd') || haystack.includes('pipeline') || haystack.includes('github actions'))) ||
+          (currentFilter === 'monitoring' && (haystack.includes('prometheus') || haystack.includes('grafana') || haystack.includes('мониторинг'))) ||
+          (currentFilter === 'security' && (haystack.includes('security') || haystack.includes('безопас') || haystack.includes('уязвим')));
+        const matchesSearch = !currentSearch || haystack.includes(currentSearch);
+        card.style.display = matchesFilter && matchesSearch ? '' : 'none';
+      });
+    }
+
+    function setFilter(filter) {
+      currentFilter = filter.toLowerCase();
+      document.querySelectorAll('#filter-chips button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === currentFilter);
+      });
+      applyFilters();
+    }
+
+    async function refreshLiveNews(forceServer = true) {
+      const buttons = document.querySelectorAll('button[onclick*="refreshLiveNews"]');
+      buttons.forEach(button => button.disabled = true);
+
+      try {
+        if (forceServer) {
+          await fetch('/api/refresh', { method: 'POST' });
+        }
+
+        const response = await fetch('/api/news');
+        const data = await response.json();
+        allLiveItems = data.items || [];
+        renderStories(allLiveItems);
+        updateLastUpdated(data.updated);
+        applyFilters();
+        updateAllTimes();
+        showToast(t('loaded', allLiveItems.length));
+      } catch (error) {
+        console.error(error);
+        alert(t('failed'));
+      } finally {
+        buttons.forEach(button => button.disabled = false);
+      }
+    }
+
+    function showToast(message) {
+      const toast = document.createElement('div');
+      toast.className = 'fixed bottom-4 left-1/2 -translate-x-1/2 text-white text-sm px-4 py-2 rounded-full shadow';
+      toast.style.background = '#202124';
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 2200);
+    }
+
+    function init() {
+      allLiveItems = readCurrentCards();
+      setTheme(currentTheme);
+      setLanguage(currentLang);
+
+      document.querySelectorAll('[data-lang-option]').forEach(button => {
+        button.addEventListener('click', () => setLanguage(button.dataset.langOption));
+      });
+
+      const themeButton = document.getElementById('theme-toggle');
+      if (themeButton) {
+        themeButton.addEventListener('click', () => setTheme(currentTheme === 'dark' ? 'light' : 'dark'));
+      }
+
+      document.querySelectorAll('#filter-chips button').forEach(button => {
+        button.addEventListener('click', () => setFilter(button.dataset.filter));
+      });
+
+      const search = document.getElementById('search-input');
+      let searchTimer;
+      search.addEventListener('input', (event) => {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(() => {
+          currentSearch = (event.target.value || '').toLowerCase().trim();
+          applyFilters();
+        }, 120);
+      });
+
+      fetch('/api/news')
+        .then(response => response.json())
+        .then(data => {
+          allLiveItems = data.items || [];
+          if (allLiveItems.length > 0) {
+            renderStories(allLiveItems);
+            updateLastUpdated(data.updated);
+            applyFilters();
+          }
+        })
+        .catch(() => {});
+
+      setInterval(updateAllTimes, 45000);
+      setInterval(() => {
+        if (!document.hidden && currentFilter === 'all' && !currentSearch) {
+          fetch('/api/news')
+            .then(response => response.json())
+            .then(data => {
+              if (data.items && data.items.length) {
+                allLiveItems = data.items;
+                renderStories(allLiveItems);
+                updateLastUpdated(data.updated);
+              }
+            })
+            .catch(() => {});
+        }
+      }, 90 * 1000);
+    }
+
+    window.DevOpsNews = { refresh: refreshLiveNews, getItems: () => allLiveItems };
+    window.addEventListener('load', init);
+  </script>
+</body>
+</html>

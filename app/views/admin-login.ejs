@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    body { font-family: 'Inter', system_ui, -apple-system, sans-serif; }
+    .logo-font { font-family: 'Space Grotesk', 'Inter', sans-serif; font-weight: 600; letter-spacing: -0.02em; }
+  </style>
+</head>
+<body class="bg-slate-950 text-white">
+  <div class="min-h-screen flex items-center justify-center p-6">
+    <div class="w-full max-w-md">
+      <!-- Logo -->
+      <div class="flex justify-center mb-8">
+        <a href="/" class="flex items-center gap-x-3">
+          <div class="w-11 h-11 bg-indigo-600 rounded-2xl flex items-center justify-center">
+            <i class="fa-solid fa-infinity text-white text-3xl"></i>
+          </div>
+          <span class="logo-font text-3xl font-semibold tracking-tighter">DevOps News</span>
+        </a>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl">
+        <div class="text-center mb-7">
+          <h1 class="text-2xl font-semibold tracking-tight">Вход в админ-панель</h1>
+          <p class="text-slate-400 text-sm mt-1">Закрытый редакторский вход</p>
+        </div>
+
+        <% if (needLogin || msg) { %>
+          <div class="mb-5 px-4 py-3 rounded-2xl text-sm <%= msg && msg.includes('Неверный') ? 'bg-red-500/10 text-red-400 border border-red-500/30' : 'bg-amber-500/10 text-amber-300 border border-amber-500/30' %>">
+            <%= msg ? decodeURIComponent(msg) : 'Введите логин и пароль для доступа' %>
+          </div>
+        <% } %>
+
+        <form method="POST" action="<%= adminPath %>/login">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1.5 tracking-wider">ЛОГИН</label>
+              <input type="text" name="username" required autocomplete="username"
+                     class="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 transition-colors text-white placeholder:text-slate-500 rounded-2xl px-4 py-3 text-lg outline-none"
+                     placeholder="admin" autofocus>
+            </div>
+
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1.5 tracking-wider">ПАРОЛЬ</label>
+              <input type="password" name="password" required autocomplete="current-password"
+                     class="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 transition-colors text-white placeholder:text-slate-500 rounded-2xl px-4 py-3 text-lg outline-none"
+                     placeholder="••••••••">
+            </div>
+
+            <button type="submit"
+                    class="w-full bg-white hover:bg-slate-100 active:bg-slate-200 transition text-slate-950 font-semibold py-3.5 rounded-2xl mt-2 flex items-center justify-center gap-x-2">
+              <i class="fa-solid fa-sign-in-alt"></i>
+              <span>Войти в панель</span>
+            </button>
+          </div>
+        </form>
+
+        <div class="mt-7 pt-6 border-t border-slate-800 text-center">
+          <a href="/" class="inline-block text-xs text-slate-400 hover:text-slate-200 transition">← Вернуться на сайт</a>
+        </div>
+      </div>
+
+      <p class="text-center text-[10px] text-slate-600 mt-5">Это учебный проект. Все изменения сохраняются в файл articles.json</p>
+    </div>
+  </div>
+
+  <script>
+    // Tailwind play CDN config
+    function configureTailwind() {
+      // already styled inline, no extra needed
+    }
+    configureTailwind();
+  </script>
+</body>
+</html>

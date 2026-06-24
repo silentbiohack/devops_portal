@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <script>
+    (function () {
+      document.documentElement.dataset.theme = localStorage.getItem('devops-theme') || 'light';
+      document.documentElement.lang = (localStorage.getItem('devops-lang') || 'ru') === 'kk' ? 'kk' : 'ru';
+    })();
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/site-theme.css">
+  <style>
+    body { font-family: Inter, system-ui, -apple-system, sans-serif; }
+    .logo-font { font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; letter-spacing: -0.02em; }
+    .lesson-prose { font-size: 1rem; line-height: 1.75; }
+    .lesson-prose h2 { font-size: 1.6rem; font-weight: 700; margin-top: 2rem; margin-bottom: .75rem; letter-spacing: -.02em; }
+    .lesson-prose h3 { font-size: 1.2rem; font-weight: 650; margin-top: 1.5rem; margin-bottom: .5rem; }
+    .lesson-prose p { margin-bottom: 1rem; color: #334155; }
+    .lesson-prose ul, .lesson-prose ol { margin: 1rem 0; padding-left: 1.25rem; }
+    .lesson-prose li { margin-bottom: .35rem; }
+    .lesson-prose table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: .92rem; }
+    .lesson-prose th, .lesson-prose td { border: 1px solid #e2e8f0; padding: .65rem; vertical-align: top; }
+    .lesson-prose th { background: #f8fafc; font-weight: 700; }
+    .lesson-prose code { background: #eef2ff; color: #3730a3; padding: 2px 6px; border-radius: 6px; }
+    .lesson-prose pre { background: #0f172a; color: #e0e7ff; padding: 1rem; border-radius: 12px; overflow-x: auto; }
+    .quiz-option.correct { border-color: #10b981; background: #ecfdf5; }
+    .quiz-option.wrong { border-color: #ef4444; background: #fef2f2; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
+      <a href="/" class="flex items-center gap-x-3">
+        <div class="w-8 h-8 bg-indigo-600 rounded-xl flex items-center justify-center">
+          <i class="fa-solid fa-infinity text-white text-xl"></i>
+        </div>
+        <span class="logo-font text-2xl font-semibold tracking-tight">DevOps News</span>
+      </a>
+      <nav class="flex items-center gap-2 text-sm">
+        <a href="/learning" class="px-3 py-2 text-indigo-600 font-semibold">Все материалы</a>
+        <a href="https://t.me/devops_news_bot" target="_blank" rel="noopener" class="site-control px-3 py-2 rounded-full flex items-center gap-x-2">
+          <i class="fa-brands fa-telegram text-sky-500"></i>
+          <span class="hidden sm:inline">@devops_news_bot</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 py-10">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <article class="lg:col-span-8">
+        <div class="mb-6">
+          <div class="flex flex-wrap items-center gap-2 text-xs text-slate-500 mb-4">
+            <span class="px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 font-semibold"><%= lesson.lessonNumber %></span>
+            <span><%= lesson.module %></span>
+            <span>·</span>
+            <span><%= lesson.duration %></span>
+          </div>
+          <h1 class="text-4xl md:text-5xl font-semibold tracking-tight leading-tight mb-4"><%= lesson.title %></h1>
+          <p class="text-xl text-slate-600"><%= lesson.summary %></p>
+        </div>
+
+        <section class="bg-white border border-slate-200 rounded-2xl p-6 mb-6">
+          <h2 class="font-semibold text-lg mb-3">Цели урока</h2>
+          <div class="lesson-prose"><%- objectivesHtml %></div>
+        </section>
+
+        <section class="bg-white border border-slate-200 rounded-2xl p-6 mb-6">
+          <div class="lesson-prose"><%- htmlContent %></div>
+        </section>
+
+        <section class="bg-white border border-slate-200 rounded-2xl p-6 mb-6">
+          <h2 class="font-semibold text-lg mb-3">Практика и тренажёр</h2>
+          <div class="lesson-prose mb-5"><%- practiceHtml %></div>
+          <div class="border border-slate-200 rounded-2xl p-4 bg-slate-50">
+            <label class="block text-sm font-semibold text-slate-700 mb-2">Ваш ответ</label>
+            <textarea id="trainer-notes" rows="7" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-sm outline-none focus:border-indigo-500" placeholder="Опишите проблему, ожидания от курса и выбранный подход..."></textarea>
+            <div class="flex flex-wrap items-center gap-3 mt-3">
+              <button type="button" onclick="saveTrainerNotes()" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm font-semibold">Сохранить заметку</button>
+              <button type="button" onclick="clearTrainerNotes()" class="px-4 py-2 rounded-xl border border-slate-300 text-sm font-semibold text-slate-600">Очистить</button>
+              <span id="trainer-status" class="text-xs text-slate-500"></span>
+            </div>
+          </div>
+        </section>
+
+        <% if (resourcesHtml) { %>
+          <section class="bg-white border border-slate-200 rounded-2xl p-6 mb-6">
+            <h2 class="font-semibold text-lg mb-3">Дополнительные материалы</h2>
+            <div class="lesson-prose"><%- resourcesHtml %></div>
+          </section>
+        <% } %>
+
+        <section class="bg-white border border-slate-200 rounded-2xl p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="font-semibold text-lg">Самопроверка</h2>
+            <span id="quiz-score" class="text-sm text-slate-500"></span>
+          </div>
+          <div id="quiz-root" class="space-y-4"></div>
+          <button type="button" onclick="checkQuiz()" class="mt-5 px-5 py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-semibold">Проверить ответы</button>
+        </section>
+      </article>
+
+      <aside class="lg:col-span-4">
+        <div class="sticky top-24 space-y-4">
+          <div class="bg-white border border-slate-200 rounded-2xl p-5">
+            <div class="text-xs text-slate-400 uppercase tracking-wider mb-2">Навигация</div>
+            <div class="space-y-2 text-sm">
+              <% if (previousLesson) { %>
+                <a href="/learning/<%= previousLesson.slug %>" class="block text-slate-600 hover:text-indigo-600">← <%= previousLesson.title %></a>
+              <% } %>
+              <% if (nextLesson) { %>
+                <a href="/learning/<%= nextLesson.slug %>" class="block text-slate-600 hover:text-indigo-600">Следующий урок → <%= nextLesson.title %></a>
+              <% } %>
+              <a href="/learning" class="block text-indigo-600 font-semibold">Все материалы</a>
+            </div>
+          </div>
+
+          <div class="bg-sky-50 border border-sky-100 rounded-2xl p-5">
+            <div class="flex items-center gap-3 mb-3">
+              <i class="fa-brands fa-telegram text-2xl text-sky-500"></i>
+              <div>
+                <div class="font-semibold">Telegram-бот</div>
+                <div class="text-xs text-slate-500">Новости и обновления курса</div>
+              </div>
+            </div>
+            <a href="https://t.me/devops_news_bot" target="_blank" rel="noopener" class="inline-flex items-center gap-x-2 px-4 py-2 bg-sky-500 text-white rounded-xl text-sm font-semibold">
+              Открыть @devops_news_bot
+              <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+            </a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    const lessonSlug = '<%= lesson.slug %>';
+    const quiz = <%- quizJson %>;
+
+    function notesKey() {
+      return `devops-lesson-notes:${lessonSlug}`;
+    }
+
+    function saveTrainerNotes() {
+      const notes = document.getElementById('trainer-notes');
+      localStorage.setItem(notesKey(), notes.value || '');
+      document.getElementById('trainer-status').textContent = 'Сохранено в браузере';
+    }
+
+    function clearTrainerNotes() {
+      localStorage.removeItem(notesKey());
+      document.getElementById('trainer-notes').value = '';
+      document.getElementById('trainer-status').textContent = 'Очищено';
+    }
+
+    function renderQuiz() {
+      const root = document.getElementById('quiz-root');
+      if (!quiz.length) {
+        root.innerHTML = '<div class="text-sm text-slate-500">Квиз пока не добавлен.</div>';
+        return;
+      }
+
+      root.innerHTML = quiz.map((item, index) => `
+        <div class="border border-slate-200 rounded-2xl p-4">
+          <div class="font-semibold mb-3">${index + 1}. ${escapeHtml(item.question)}</div>
+          <div class="space-y-2">
+            ${(item.options || []).map((option, optionIndex) => `
+              <label class="quiz-option flex items-start gap-2 border border-slate-200 rounded-xl px-3 py-2 cursor-pointer" data-question="${index}" data-option="${optionIndex}">
+                <input type="radio" name="quiz-${index}" value="${optionIndex}" class="mt-1">
+                <span>${escapeHtml(option)}</span>
+              </label>
+            `).join('')}
+          </div>
+          <div class="quiz-explanation hidden mt-3 text-sm text-slate-600"></div>
+        </div>
+      `).join('');
+    }
+
+    function checkQuiz() {
+      let score = 0;
+      quiz.forEach((item, index) => {
+        const selected = document.querySelector(`input[name="quiz-${index}"]:checked`);
+        const selectedIndex = selected ? Number(selected.value) : -1;
+        if (selectedIndex === item.correctIndex) score++;
+
+        document.querySelectorAll(`[data-question="${index}"]`).forEach(label => {
+          const optionIndex = Number(label.dataset.option);
+          label.classList.toggle('correct', optionIndex === item.correctIndex);
+          label.classList.toggle('wrong', selectedIndex === optionIndex && selectedIndex !== item.correctIndex);
+        });
+
+        const explanation = document.querySelectorAll('.quiz-explanation')[index];
+        if (explanation) {
+          explanation.textContent = item.explanation || '';
+          explanation.classList.remove('hidden');
+        }
+      });
+
+      document.getElementById('quiz-score').textContent = `${score} из ${quiz.length}`;
+      localStorage.setItem(`devops-lesson-score:${lessonSlug}`, String(score));
+    }
+
+    function escapeHtml(value = '') {
+      return String(value).replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[char]));
+    }
+
+    window.addEventListener('load', () => {
+      document.getElementById('trainer-notes').value = localStorage.getItem(notesKey()) || '';
+      renderQuiz();
+    });
+  </script>
+  <script src="/site-prefs.js"></script>
+</body>
+</html>

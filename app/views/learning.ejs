@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <script>
+    (function () {
+      document.documentElement.dataset.theme = localStorage.getItem('devops-theme') || 'light';
+      document.documentElement.lang = (localStorage.getItem('devops-lang') || 'ru') === 'kk' ? 'kk' : 'ru';
+    })();
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/site-theme.css">
+  <style>
+    body { font-family: Inter, system-ui, -apple-system, sans-serif; }
+    .logo-font { font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; letter-spacing: -0.02em; }
+    .learning-card { min-height: 188px; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
+      <a href="/" class="flex items-center gap-x-3">
+        <div class="w-8 h-8 bg-indigo-600 rounded-xl flex items-center justify-center">
+          <i class="fa-solid fa-infinity text-white text-xl"></i>
+        </div>
+        <span class="logo-font text-2xl font-semibold tracking-tight">DevOps News</span>
+      </a>
+
+      <nav class="flex items-center gap-2 text-sm">
+        <a href="/" class="px-3 py-2 text-slate-600 hover:text-indigo-600">Новости</a>
+        <a href="/learning" class="px-3 py-2 text-indigo-600 font-semibold">Обучение</a>
+        <a href="/about" class="px-3 py-2 text-slate-600 hover:text-indigo-600">О проекте</a>
+        <a href="https://t.me/devops_news_bot" target="_blank" rel="noopener" class="site-control px-3 py-2 rounded-full flex items-center gap-x-2">
+          <i class="fa-brands fa-telegram text-sky-500"></i>
+          <span class="hidden sm:inline">@devops_news_bot</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 py-10">
+    <section class="mb-8">
+      <div class="text-sm font-semibold text-indigo-600 mb-2">Обучение</div>
+      <h1 class="text-4xl md:text-5xl font-semibold tracking-tight mb-3">Все материалы</h1>
+      <p class="text-lg text-slate-600 max-w-3xl">Курс, тренажёры и короткие статьи по DevOps, Kubernetes, CI/CD, GitOps, SRE и Platform Engineering.</p>
+    </section>
+
+    <section class="mb-10">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-semibold">Курс DevOps 2026</h2>
+        <span class="text-xs text-slate-500"><%= lessons.length %> уроков</span>
+      </div>
+
+      <% if (lessons && lessons.length) { %>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <% lessons.forEach(lesson => { %>
+            <a href="/learning/<%= lesson.slug %>" class="learning-card bg-white border border-slate-200 rounded-2xl p-5 hover:border-indigo-300 hover:shadow-sm transition flex flex-col">
+              <div class="flex items-center gap-2 text-xs text-slate-500 mb-3">
+                <span class="px-2 py-1 rounded-full bg-indigo-50 text-indigo-700 font-semibold"><%= lesson.lessonNumber %></span>
+                <span><%= lesson.duration %></span>
+                <span>·</span>
+                <span><%= lesson.level %></span>
+              </div>
+              <div class="text-sm text-slate-500 mb-1"><%= lesson.week %></div>
+              <h3 class="text-xl font-semibold leading-tight mb-2"><%= lesson.title %></h3>
+              <p class="text-sm text-slate-600 line-clamp-3"><%= lesson.summary %></p>
+              <div class="mt-auto pt-4 text-sm text-indigo-600 font-semibold flex items-center gap-x-2">
+                Открыть урок
+                <i class="fa-solid fa-arrow-right text-xs"></i>
+              </div>
+            </a>
+          <% }) %>
+        </div>
+      <% } else { %>
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 text-slate-500">Уроков пока нет.</div>
+      <% } %>
+    </section>
+
+    <section>
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-semibold">Статьи для глубокого изучения</h2>
+        <span class="text-xs text-slate-500"><%= materials.length %> материалов</span>
+      </div>
+
+      <% if (materials && materials.length) { %>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <% materials.forEach(item => { %>
+            <a href="/article/<%= item.slug %>" class="bg-white border border-slate-200 rounded-2xl p-5 hover:border-indigo-300 hover:shadow-sm transition">
+              <div class="text-xs uppercase tracking-wider text-slate-400 mb-2"><%= item.category %></div>
+              <h3 class="font-semibold leading-tight mb-2"><%= item.title %></h3>
+              <% if (item.summary) { %>
+                <p class="text-sm text-slate-600 line-clamp-3"><%= item.summary %></p>
+              <% } %>
+              <div class="mt-4 text-xs text-slate-400"><%= item.date %> · <%= item.author %></div>
+            </a>
+          <% }) %>
+        </div>
+      <% } else { %>
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 text-slate-500">Материалов пока нет.</div>
+      <% } %>
+    </section>
+  </main>
+
+  <footer class="border-t bg-white py-6">
+    <div class="max-w-6xl mx-auto px-6 text-xs text-slate-400 flex justify-between gap-4">
+      <span>DevOps News · обучение</span>
+      <a href="https://t.me/devops_news_bot" target="_blank" rel="noopener" class="text-sky-600 hover:underline">@devops_news_bot</a>
+    </div>
+  </footer>
+  <script src="/site-prefs.js"></script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <script>
+    (function () {
+      document.documentElement.dataset.theme = localStorage.getItem('devops-theme') || 'light';
+      document.documentElement.lang = (localStorage.getItem('devops-lang') || 'ru') === 'kk' ? 'kk' : 'ru';
+    })();
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/site-theme.css">
+  <style>
+    body { font-family: 'Inter', system_ui, -apple-system, sans-serif; }
+    .logo-font { font-family: 'Space Grotesk', 'Inter', sans-serif; font-weight: 600; letter-spacing: -0.02em; }
+    .prose { font-size: 1.05rem; line-height: 1.75; max-width: 100%; }
+    .prose h2 { font-size: 1.65rem; font-weight: 700; margin-top: 2rem; margin-bottom: 0.75rem; letter-spacing: -.025em; }
+    .prose h3 { font-size: 1.25rem; font-weight: 600; margin-top: 1.75rem; margin-bottom: 0.5rem; }
+    .prose p { margin-bottom: 1.15rem; color: #334155; }
+    .prose ul { margin: 1rem 0; padding-left: 1.25rem; }
+    .prose li { margin-bottom: 0.35rem; }
+    .prose blockquote { border-left: 4px solid #6366f1; padding-left: 1.25rem; margin: 1.5rem 0; color: #475569; font-style: italic; }
+    .prose code { background: #f1e7ff; color: #4338ca; padding: 2px 7px; border-radius: 6px; font-size: 0.9em; }
+    .prose pre { background: #0f172a; color: #e0e7ff; padding: 1.25rem; border-radius: 12px; overflow-x: auto; margin: 1.25rem 0; font-size: 0.9rem; }
+    .prose pre code { background: none; padding: 0; color: inherit; }
+    .nav-link { transition: color 0.1s ease; }
+    .nav-link:hover { color: #6366f1; }
+  </style>
+</head>
+<body class="bg-slate-50">
+  <!-- Header -->
+  <header class="bg-white border-b border-slate-200">
+    <div class="max-w-5xl mx-auto px-6">
+      <div class="flex items-center justify-between h-16">
+        <a href="/" class="flex items-center gap-x-3">
+          <div class="w-8 h-8 bg-indigo-600 rounded-xl flex items-center justify-center">
+            <i class="fa-solid fa-infinity text-white text-xl"></i>
+          </div>
+          <span class="logo-font text-2xl font-semibold tracking-tight">DevOps News</span>
+        </a>
+        
+        <div class="flex items-center gap-x-2 text-sm">
+          <div class="flex items-center rounded-full overflow-hidden">
+            <button type="button" class="site-seg px-3 py-2 text-xs font-semibold" data-lang-option="ru">RU</button>
+            <button type="button" class="site-seg px-3 py-2 text-xs font-semibold border-l-0" data-lang-option="kk">KZ</button>
+          </div>
+          <button id="site-theme-toggle" type="button" class="site-control w-10 h-10 rounded-full" aria-label="Theme"></button>
+          <a href="/" class="nav-link px-4 py-2 text-slate-600 font-medium" data-i18n="allArticles">← Все статьи</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="max-w-5xl mx-auto px-6 pt-10 pb-16">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-x-10">
+      
+      <!-- Main content -->
+      <article class="lg:col-span-8">
+        <!-- Meta -->
+        <div class="flex items-center gap-x-3 mb-4">
+          <span class="inline-block px-3.5 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-full tracking-wider">
+            <%= article.category %>
+          </span>
+          <span class="text-sm text-slate-500"><%= article.date %></span>
+          <span class="text-sm text-slate-400">•</span>
+          <span class="text-sm text-slate-500"><%= article.author %></span>
+        </div>
+
+        <h1 class="text-4xl md:text-5xl font-semibold tracking-tighter leading-none mb-6">
+          <%= article.title %>
+        </h1>
+
+        <% if (article.summary) { %>
+          <p class="text-xl text-slate-600 mb-8 max-w-prose">
+            <%= article.summary %>
+          </p>
+        <% } %>
+
+        <!-- Article body -->
+        <div class="prose max-w-none">
+          <%- htmlContent %>
+        </div>
+
+        <!-- Share / actions -->
+        <div class="mt-12 pt-8 border-t flex flex-wrap gap-3">
+          <button onclick="window.location.href='/'" 
+                  class="flex-1 sm:flex-none px-6 py-3 text-sm font-semibold border border-slate-300 hover:bg-white rounded-2xl transition flex items-center justify-center gap-x-2">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span data-i18n="toAll">Ко всем статьям</span>
+          </button>
+          
+          <button onclick="copyArticleLink()" 
+                  class="flex-1 sm:flex-none px-6 py-3 text-sm font-semibold border border-slate-300 hover:bg-white rounded-2xl transition flex items-center justify-center gap-x-2">
+            <i class="fa-solid fa-link"></i>
+            <span data-i18n="copyLink">Скопировать ссылку</span>
+          </button>
+        </div>
+      </article>
+
+      <!-- Sidebar -->
+      <aside class="lg:col-span-4 mt-10 lg:mt-2">
+        <div class="bg-white border border-slate-200 rounded-3xl p-6 sticky top-6">
+          <div class="text-sm font-semibold mb-3 text-slate-500" data-i18n="related">Похожие материалы</div>
+          
+          <% if (related && related.length > 0) { %>
+            <div class="space-y-4">
+              <% related.forEach(r => { %>
+                <a href="/article/<%= r.slug %>" class="block group">
+                  <div class="text-sm font-medium group-hover:text-indigo-600 leading-tight"><%= r.title %></div>
+                  <div class="text-xs text-slate-400 mt-0.5"><%= r.date %> • <%= r.category %></div>
+                </a>
+              <% }) %>
+            </div>
+          <% } else { %>
+            <p class="text-sm text-slate-400" data-i18n="noRelated">Пока нет похожих статей в этой категории.</p>
+          <% } %>
+
+          <div class="my-6 border-t"></div>
+
+          <div class="text-xs text-slate-500">
+            <span data-i18n="shareHint">Статья полезна? Поделитесь с коллегами.</span><br>
+            <span data-i18n="suggestTopic">Хотите предложить тему — напишите редакции.</span>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+
+  <footer class="border-t bg-white py-6">
+    <div class="max-w-5xl mx-auto px-6 text-xs text-slate-400">
+      <span data-i18n="articleFooter">DevOps News — образовательный проект. Материалы обновляются через закрытую редакторскую панель.</span>
+    </div>
+  </footer>
+
+  <script>
+    // Tailwind
+    function init() {
+      // nothing extra needed
+    }
+    init();
+  </script>
+  <script src="/site-prefs.js"></script>
+</body>
+</html>

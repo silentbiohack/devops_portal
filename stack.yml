@@ -1,8 +1,8 @@
 version: "3.8"
 
 services:
-  web:
-    image: custom-nginx:latest
+  news:
+    image: devops-news:latest
     deploy:
       replicas: 3
       restart_policy:
@@ -15,7 +15,10 @@ services:
       placement:
         max_replicas_per_node: 2
     ports:
-      - "80:80"
+      - "80:3000"
+    volumes:
+      - /mnt/devops-news-data:/app/data
+      - /opt/devops-news/.env:/app/.env:ro
     networks:
       - webnet
 

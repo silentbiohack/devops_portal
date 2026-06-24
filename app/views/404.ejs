@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <script>
+    (function () {
+      document.documentElement.dataset.theme = localStorage.getItem('devops-theme') || 'light';
+      document.documentElement.lang = (localStorage.getItem('devops-lang') || 'ru') === 'kk' ? 'kk' : 'ru';
+    })();
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/site-theme.css">
+  <style>
+    body { font-family: 'Inter', system_ui, -apple-system, sans-serif; }
+    .logo-font { font-family: 'Space Grotesk', 'Inter', sans-serif; font-weight: 600; letter-spacing: -0.02em; }
+  </style>
+</head>
+<body class="bg-slate-50 flex items-center justify-center min-h-screen">
+  <div class="text-center px-6">
+    <div class="mx-auto w-16 h-16 bg-slate-200 rounded-3xl flex items-center justify-center mb-6">
+      <i class="fa-solid fa-question text-4xl text-slate-400"></i>
+    </div>
+    <h1 class="text-6xl font-semibold tracking-tighter mb-1">404</h1>
+    <p class="text-xl text-slate-600 mb-8" data-i18n="notFound">Страница не найдена</p>
+    
+    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+      <a href="/" class="inline-flex items-center justify-center gap-x-2 px-6 py-3 bg-white border border-slate-200 hover:bg-slate-50 rounded-2xl font-medium text-sm">
+        <i class="fa-solid fa-home"></i>
+        <span data-i18n="backHome">На главную</span>
+      </a>
+    </div>
+    <div class="mt-6 flex items-center justify-center gap-x-2">
+      <div class="flex items-center rounded-full overflow-hidden">
+        <button type="button" class="site-seg px-3 py-2 text-xs font-semibold" data-lang-option="ru">RU</button>
+        <button type="button" class="site-seg px-3 py-2 text-xs font-semibold border-l-0" data-lang-option="kk">KZ</button>
+      </div>
+      <button id="site-theme-toggle" type="button" class="site-control w-10 h-10 rounded-full" aria-label="Theme"></button>
+    </div>
+  </div>
+  <script src="/site-prefs.js"></script>
+</body>
+</html>
