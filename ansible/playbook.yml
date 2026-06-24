@@ -1,0 +1,114 @@
+---
+- name: Install Docker and prepare nodes
+  hosts: swarm_nodes
+  become: yes
+  tasks:
+    - name: Set hostname
+      hostname:
+        name: "{{ inventory_hostname }}"
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install Docker Engine
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Ensure Docker service is running and enabled
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Add devops user to docker group
+      user:
+        name: devops
+        groups: docker
+        append: yes
+
+    - name: Open required firewall ports
+      command: "ufw allow {{ item }}"
+      loop:
+        - "22/tcp"
+        - "80/tcp"
+        - "2377/tcp"
+        - "7946/tcp"
+        - "7946/udp"
+        - "4789/udp"
+      ignore_errors: yes
+
+    - name: Ensure project directories exist
+      file:
+        path: "/home/devops/devops-project/{{ item }}"
+        state: directory
+        owner: devops
+        group: devops
+      loop:
+        - app
+        - docker
+
+    - name: Copy index.html
+      copy:
+        src: "{{ playbook_dir }}/../app/index.html"
+        dest: /home/devops/devops-project/app/index.html
+        owner: devops
+        group: devops
+
+    - name: Copy Dockerfile
+      copy:
+        src: "{{ playbook_dir }}/../docker/Dockerfile"
+        dest: /home/devops/devops-project/docker/Dockerfile
+        owner: devops
+        group: devops
+
+    - name: Copy stack.yml
+      copy:
+        src: "{{ playbook_dir }}/../stack.yml"
+        dest: /home/devops/devops-project/stack.yml
+        owner: devops
+        group: devops
+
+    - name: Build custom Nginx image
+      command: docker build -t custom-nginx:latest -f docker/Dockerfile .
+      args:
+        chdir: /home/devops/devops-project
+
+- name: Initialize Docker Swarm on manager
+  hosts: manager
+  become: yes
+  tasks:
+    - name: Initialize swarm
+      command: "docker swarm init --advertise-addr {{ ansible_host }}"
+      register: swarm_init
+      failed_when: swarm_init.rc != 0 and 'already part of a swarm' not in swarm_init.stderr
+      changed_when: swarm_init.rc == 0
+
+    - name: Get worker join token
+      command: docker swarm join-token -q worker
+      register: worker_token
+      changed_when: false
+
+- name: Join workers to Swarm
+  hosts: workers
+  become: yes
+  tasks:
+    - name: Join swarm as worker
+      command: >
+        docker swarm join
+        --token {{ hostvars[groups['manager'][0]].worker_token.stdout }}
+        {{ hostvars[groups['manager'][0]].ansible_host }}:2377
+      register: join_result
+      failed_when: join_result.rc != 0 and 'already part of a swarm' not in join_result.stderr
+      changed_when: join_result.rc == 0
+
+- name: Deploy stack on manager
+  hosts: manager
+  become: yes
+  tasks:
+    - name: Deploy webapp stack
+      command: docker stack deploy -c /home/devops/devops-project/stack.yml webapp
+      args:
+        chdir: /home/devops/devops-project

@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  web:
+    image: custom-nginx:latest
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      update_config:
+        parallelism: 1
+        delay: 10s
+      placement:
+        max_replicas_per_node: 2
+    ports:
+      - "80:80"
+    networks:
+      - webnet
+
+networks:
+  webnet:
+    driver: overlay
+    attachable: true
